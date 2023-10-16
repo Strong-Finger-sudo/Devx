@@ -1,0 +1,30 @@
+version: '3.5'
+services:
+
+    question_db:
+      container_name: question_db
+      image: postgres
+      command: -p 1221
+      expose:
+        - 1221
+      volumes:
+        - db_data:/var/lib/postgresql/data
+        - ./sql:/docker-entrypoint-initdb.d
+        - ./config/postgresql.conf:/etc/postgresql/postgresql.conf:ro
+      env_file:
+        - .env
+
+    fastapi:
+      build:
+        context: .
+      container_name: fastapi_app
+      command: ["/fastapi_app/docker/app.sh"]
+      ports:
+        - '9000:8000'
+      depends_on:
+        - question_db
+
+volumes:
+  db_data:
+  sql:
+  config:
